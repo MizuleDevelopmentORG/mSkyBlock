@@ -1,4 +1,4 @@
-package com.mizuledevelopment.database;
+package com.mizuledevelopment.mskyblock.database;
 
 public enum DatabaseType {
 

@@ -1,4 +1,4 @@
-package com.mizuledevelopment.utils.config;
+package com.mizuledevelopment.mskyblock.utils.config;
 
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.YamlConfiguration;
