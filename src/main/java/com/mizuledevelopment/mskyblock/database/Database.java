@@ -1,6 +1,5 @@
 package com.mizuledevelopment.mskyblock.database;
 
-import com.mizuledevelopment.mskyblock.database.impl.FlatFile;
 import com.mizuledevelopment.mskyblock.database.impl.Mongo;
 import com.mizuledevelopment.mskyblock.database.impl.MySQL;
 import com.mizuledevelopment.mskyblock.mSkyBlock;
@@ -12,12 +11,10 @@ public class Database {
     private final Storage storage;
 
     public Database(final DatabaseType databaseType) {
-        if (databaseType.equals(DatabaseType.FLAT_FILE)) {
-            this.storage = new FlatFile(mSkyBlock.getInstance());
-        } else if (databaseType.equals(DatabaseType.MYSQL)) {
-            this.storage = new MySQL(mSkyBlock.getInstance());
+        if (databaseType.equals(DatabaseType.MYSQL)) {
+            this.storage = new MySQL();
         } else if (databaseType.equals(DatabaseType.MONGO)) {
-            this.storage = new Mongo(mSkyBlock.getInstance());
+            this.storage = new Mongo();
         } else {
             Bukkit.getConsoleSender().sendMessage(MiniMessage
                     .miniMessage().deserialize("<red>[MSkyBlock] disabled due to unknown database source in configuration.yml line:1"));
@@ -27,7 +24,7 @@ public class Database {
         this.storage.init();
     }
 
-    public Storage storage() {
+    public Storage getStorage() {
         return this.storage;
     }
 }

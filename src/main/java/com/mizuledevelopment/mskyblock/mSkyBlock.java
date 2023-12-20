@@ -29,6 +29,7 @@ public final class mSkyBlock extends JavaPlugin {
         this.initializeConfig();
 
         this.database = new Database(DatabaseType.valueOf(Objects.requireNonNull(getConfiguration().getString("database")).toUpperCase(Locale.ROOT)));
+        this.database.getStorage().load();
 
         this.color = new Color();
         this.color.validate();
@@ -36,7 +37,7 @@ public final class mSkyBlock extends JavaPlugin {
 
     @Override
     public void onDisable() {
-
+        this.database.getStorage().save();
     }
 
     private void initializeConfig() {

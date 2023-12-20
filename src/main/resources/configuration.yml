@@ -1,5 +1,4 @@
-# MONGO | MYSQL | FLATFILE
-# flatfile - yml storage
+# MONGO | MYSQL
 database: "mongo"
 mongo:
   uri: ""

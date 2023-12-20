@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/mSkyBlock.iml" filepath="$PROJECT_DIR$/mSkyBlock.iml" />
+      <module fileurl="file://$PROJECT_DIR$/mskyblock.iml" filepath="$PROJECT_DIR$/mskyblock.iml" />
     </modules>
   </component>
 </project>

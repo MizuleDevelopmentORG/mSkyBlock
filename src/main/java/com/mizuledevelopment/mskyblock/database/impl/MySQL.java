@@ -3,16 +3,44 @@ package com.mizuledevelopment.mskyblock.database.impl;
 import com.mizuledevelopment.mskyblock.database.Storage;
 import com.mizuledevelopment.mskyblock.mSkyBlock;
 
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+
 public class MySQL extends Storage {
 
-    private final mSkyBlock plugin;
+    private Connection connection;
 
-    public MySQL(mSkyBlock plugin) {
-        this.plugin = plugin;
+    public Connection getConnection(){
+        if (connection != null) return connection;
+
+        String url =
+                "jdbc:mysql://" +
+                mSkyBlock.getInstance().getConfiguration().getString("mysql.host") +
+                ":" + mSkyBlock.getInstance().getConfiguration().getString("mysql.port") + "/"
+                + mSkyBlock.getInstance().getConfiguration().getString("mysql.database");
+        String user = mSkyBlock.getInstance().getConfiguration().getString("mysql.auth.user");
+        String pass = mSkyBlock.getInstance().getConfiguration().getString("mysql.auth.password");
+
+        try {
+            return this.connection = DriverManager.getConnection(url, user, pass);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
     public void init(){
+
+    }
+
+    @Override
+    public void load() {
+
+    }
+
+    @Override
+    public void save() {
 
     }
 
