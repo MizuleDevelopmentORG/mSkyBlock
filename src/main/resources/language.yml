@@ -1,0 +1,6 @@
+command:
+  no-permissions: "<red>No Permissions"
+  only-player: "<red>Command can be only executed by PLAYER"
+
+island:
+  create-usage: "<red>/island create"

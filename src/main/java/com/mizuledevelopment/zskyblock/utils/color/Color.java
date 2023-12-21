@@ -15,7 +15,8 @@ public class Color {
 
         if (!Objects.requireNonNull(format).equalsIgnoreCase("modern") && !format.equalsIgnoreCase("legacy")) {
             Bukkit.getPluginManager().disablePlugin(zSkyBlock.getInstance());
-            throw new RuntimeException("[MSkyBlock] disabled due to unknown color source in configuration.yml line:17");
+            Bukkit.getConsoleSender().sendMessage(MiniMessage.miniMessage().deserialize("[MSkyBlock] disabled due to unknown color source in configuration.yml line:17"));
+            throw new RuntimeException("Invalid color type");
         }
     }
 

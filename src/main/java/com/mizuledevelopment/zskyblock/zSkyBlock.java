@@ -7,6 +7,7 @@ import com.mizuledevelopment.zskyblock.island.manager.IslandManager;
 import com.mizuledevelopment.zskyblock.listener.SkyBlockListener;
 import com.mizuledevelopment.zskyblock.profile.manager.ProfileManager;
 import com.mizuledevelopment.zskyblock.utils.color.Color;
+import com.mizuledevelopment.zskyblock.utils.command.manager.CommandManager;
 import com.mizuledevelopment.zskyblock.utils.config.Config;
 import com.mizuledevelopment.zskyblock.utils.world.WorldManager;
 import fr.mrmicky.fastboard.adventure.FastBoard;
@@ -26,6 +27,7 @@ public final class zSkyBlock extends JavaPlugin {
     private static zSkyBlock instance;
     private Config configuration;
     private Config scoreboard;
+    private Config language;
     private Database database;
     private Color color;
     private WorldManager worldManager;
@@ -57,6 +59,7 @@ public final class zSkyBlock extends JavaPlugin {
         this.islandManager = new IslandManager();
         this.profileManager = new ProfileManager();
 
+        this.initializeCommands();
         this.initializeListeners(Bukkit.getPluginManager());
         this.initializeScoreboard();
 
@@ -80,15 +83,24 @@ public final class zSkyBlock extends JavaPlugin {
                 new YamlConfiguration(), "configuration.yml");
         this.scoreboard = new Config(this, new File(getDataFolder(), "scoreboard.yml"),
                 new YamlConfiguration(), "scoreboard.yml");
+        this.language = new Config(this, new File(getDataFolder(), "language.yml"),
+                new YamlConfiguration(), "language.yml");
 
         this.configuration.create();
         this.scoreboard.create();
+        this.language.create();
     }
 
     private void initializeListeners(PluginManager pluginManager){
         List.of(
                 new SkyBlockListener()
         ).forEach(listener -> pluginManager.registerEvents(listener, this));
+    }
+
+    private void initializeCommands(){
+        CommandManager islandCommandManager = new CommandManager(this.getCommand("island"));
+
+        islandCommandManager.registerCommands();
     }
 
     private void initializeScoreboard() {
@@ -124,6 +136,8 @@ public final class zSkyBlock extends JavaPlugin {
     }
 
     public YamlConfiguration getScoreboard() { return this.scoreboard.getConfiguration(); }
+
+    public YamlConfiguration getLanguage(){ return this.language.getConfiguration(); }
 
     public YamlConfiguration getConfiguration() {
         return this.configuration.getConfiguration();

@@ -14,6 +14,27 @@ mysql:
 # modern - supports hex colors (<red>, <green> etc).
 # legacy - old style (&6, &5, &2 etc).
 color-support: "modern"
-
 islands-world: "islands"
 
+spawn:
+  world: "world"
+  x: 0
+  y: 100
+  z: 0
+
+islands:
+  island-schematic: "island.schematic"
+  multiple-selection: false
+  inventory:
+    title: ""
+    size: 54
+  schematics:
+    1:
+      item: ""
+      name: ""
+      lore:
+        - ""
+        - ""
+        - ""
+      slot: 0
+      schematic-file: ""

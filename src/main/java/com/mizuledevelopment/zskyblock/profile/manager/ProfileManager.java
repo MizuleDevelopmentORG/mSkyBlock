@@ -9,9 +9,7 @@ public class ProfileManager {
 
     private final Set<Profile> profiles = new HashSet<>();
 
-
     public Set<Profile> getProfiles() {
-
         return profiles;
     }
 }
