@@ -2,8 +2,11 @@ package com.mizuledevelopment.mskyblock;
 
 import com.mizuledevelopment.mskyblock.database.Database;
 import com.mizuledevelopment.mskyblock.database.DatabaseType;
+import com.mizuledevelopment.mskyblock.island.manager.IslandManager;
+import com.mizuledevelopment.mskyblock.profile.manager.ProfileManager;
 import com.mizuledevelopment.mskyblock.utils.color.Color;
 import com.mizuledevelopment.mskyblock.utils.config.Config;
+import com.mizuledevelopment.mskyblock.utils.world.WorldManager;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -11,14 +14,17 @@ import java.io.File;
 import java.util.Locale;
 import java.util.Objects;
 
-public final class mSkyBlock extends JavaPlugin {
+public final class zSkyBlock extends JavaPlugin {
 
-    private static mSkyBlock instance;
+    private static zSkyBlock instance;
     private Config configuration;
     private Database database;
     private Color color;
+    private WorldManager worldManager;
+    private IslandManager islandManager;
+    private ProfileManager profileManager;
 
-    public static mSkyBlock getInstance() {
+    public static zSkyBlock getInstance() {
         return instance;
     }
 
@@ -33,6 +39,12 @@ public final class mSkyBlock extends JavaPlugin {
 
         this.color = new Color();
         this.color.validate();
+
+        this.worldManager = new WorldManager();
+        this.worldManager.create();
+        
+        this.islandManager = new IslandManager();
+        this.profileManager = new ProfileManager();
     }
 
     @Override
@@ -53,6 +65,18 @@ public final class mSkyBlock extends JavaPlugin {
 
     public Color getColor() {
         return color;
+    }
+
+    public WorldManager getWorldManager() {
+        return worldManager;
+    }
+
+    public IslandManager getIslandManager() {
+        return islandManager;
+    }
+
+    public ProfileManager getProfileManager() {
+        return profileManager;
     }
 
     public YamlConfiguration getConfiguration() {

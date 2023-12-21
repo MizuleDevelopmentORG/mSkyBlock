@@ -1,6 +1,6 @@
 package com.mizuledevelopment.mskyblock.utils.color;
 
-import com.mizuledevelopment.mskyblock.mSkyBlock;
+import com.mizuledevelopment.mskyblock.zSkyBlock;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
@@ -11,18 +11,18 @@ import java.util.Objects;
 public class Color {
 
     public void validate(){
-        String format = mSkyBlock.getInstance().getConfiguration().getString("color-support");
+        String format = zSkyBlock.getInstance().getConfiguration().getString("color-support");
         if (format != null && !format.equalsIgnoreCase("legacy")
                 || format != null && format.equalsIgnoreCase("modern")) {
             Bukkit.getConsoleSender().sendMessage(MiniMessage
                     .miniMessage().deserialize("<red>[MSkyBlock] disabled due to unknown color source in configuration.yml line:17"));
-            Bukkit.getPluginManager().disablePlugin(mSkyBlock.getInstance());
+            Bukkit.getPluginManager().disablePlugin(zSkyBlock.getInstance());
         }
     }
 
     public Component parse(String str){
         FormatType format = FormatType.valueOf
-                (Objects.requireNonNull(mSkyBlock.getInstance().getConfiguration().getString("color-support")).toUpperCase());
+                (Objects.requireNonNull(zSkyBlock.getInstance().getConfiguration().getString("color-support")).toUpperCase());
 
         if (format.equals(FormatType.LEGACY)) {
             return LegacyComponentSerializer.legacyAmpersand().deserializeOr(str, Component.empty());

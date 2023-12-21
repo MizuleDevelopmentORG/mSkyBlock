@@ -15,3 +15,5 @@ mysql:
 # legacy - old style (&6, &5, &2 etc).
 color-support: "modern"
 
+islands-world: "islands"
+

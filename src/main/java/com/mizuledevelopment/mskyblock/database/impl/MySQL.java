@@ -1,7 +1,7 @@
 package com.mizuledevelopment.mskyblock.database.impl;
 
 import com.mizuledevelopment.mskyblock.database.Storage;
-import com.mizuledevelopment.mskyblock.mSkyBlock;
+import com.mizuledevelopment.mskyblock.zSkyBlock;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -16,11 +16,11 @@ public class MySQL extends Storage {
 
         String url =
                 "jdbc:mysql://" +
-                mSkyBlock.getInstance().getConfiguration().getString("mysql.host") +
-                ":" + mSkyBlock.getInstance().getConfiguration().getString("mysql.port") + "/"
-                + mSkyBlock.getInstance().getConfiguration().getString("mysql.database");
-        String user = mSkyBlock.getInstance().getConfiguration().getString("mysql.auth.user");
-        String pass = mSkyBlock.getInstance().getConfiguration().getString("mysql.auth.password");
+                zSkyBlock.getInstance().getConfiguration().getString("mysql.host") +
+                ":" + zSkyBlock.getInstance().getConfiguration().getString("mysql.port") + "/"
+                + zSkyBlock.getInstance().getConfiguration().getString("mysql.database");
+        String user = zSkyBlock.getInstance().getConfiguration().getString("mysql.auth.user");
+        String pass = zSkyBlock.getInstance().getConfiguration().getString("mysql.auth.password");
 
         try {
             return this.connection = DriverManager.getConnection(url, user, pass);
