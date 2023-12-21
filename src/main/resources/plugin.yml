@@ -1,4 +1,4 @@
-name: mSkyBlock
+name: zSkyBlock
 version: '${project.version}'
-main: com.mizuledevelopment.mskyblock.mSkyBlock
+main: com.mizuledevelopment.zskyblock.zSkyBlock
 api-version: '1.20'
