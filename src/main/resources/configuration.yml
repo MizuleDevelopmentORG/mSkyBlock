@@ -22,19 +22,47 @@ spawn:
   y: 100
   z: 0
 
+first-island:
+  x: 0
+  y: 70
+  z: 0
+max-island-size: 100
+island-radius: 100
+
 islands:
   island-schematic: "island.schematic"
-  multiple-selection: false
+  multiple-selection: true
   inventory:
-    title: ""
+    title: "<red>Island Picker"
     size: 54
+    overlay: false
+    overlay-item: "WHITE_STAINED_GLASS_PANE"
   schematics:
     1:
-      item: ""
-      name: ""
+      item: "GRASS_BLOCK"
+      name: "<green>NORMAL Island"
       lore:
         - ""
-        - ""
+        - "<white>Click to generate <green>NORMAL <white>island"
         - ""
       slot: 0
-      schematic-file: ""
+      schematic-file: "normal.schematic"
+    2:
+      item: "OBSIDIAN"
+      name: "<red>NETHER Island"
+      lore:
+        - ""
+        - "<white>Click to generate <red>NETHER <white>island"
+        - ""
+      slot: 1
+      schematic-file: "normal.schematic"
+    3:
+      item: "END_PORTAL_FRAME"
+      name: "<blue>END Island"
+      lore:
+        - ""
+        - "<white>Click to generate <blue>END <white>island"
+        - ""
+      slot: 2
+      schematic-file: "normal.schematic"
+

@@ -2,3 +2,6 @@ name: zSkyBlock
 version: '${project.version}'
 main: com.mizuledevelopment.zskyblock.zSkyBlock
 api-version: '1.20'
+commands:
+  island:
+    aliases: [islands, is]

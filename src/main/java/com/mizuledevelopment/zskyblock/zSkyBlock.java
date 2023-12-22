@@ -3,8 +3,11 @@ package com.mizuledevelopment.zskyblock;
 import com.mizuledevelopment.zskyblock.board.BoardAdapter;
 import com.mizuledevelopment.zskyblock.database.Database;
 import com.mizuledevelopment.zskyblock.database.DatabaseType;
+import com.mizuledevelopment.zskyblock.island.command.player.IslandCreateCommand;
+import com.mizuledevelopment.zskyblock.island.listener.IslandListener;
 import com.mizuledevelopment.zskyblock.island.manager.IslandManager;
 import com.mizuledevelopment.zskyblock.listener.SkyBlockListener;
+import com.mizuledevelopment.zskyblock.profile.listener.ProfileListener;
 import com.mizuledevelopment.zskyblock.profile.manager.ProfileManager;
 import com.mizuledevelopment.zskyblock.utils.color.Color;
 import com.mizuledevelopment.zskyblock.utils.command.manager.CommandManager;
@@ -13,6 +16,7 @@ import com.mizuledevelopment.zskyblock.utils.world.WorldManager;
 import fr.mrmicky.fastboard.adventure.FastBoard;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.Bukkit;
+import org.bukkit.NamespacedKey;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -28,12 +32,14 @@ public final class zSkyBlock extends JavaPlugin {
     private Config configuration;
     private Config scoreboard;
     private Config language;
+    private Config data;
     private Database database;
     private Color color;
     private WorldManager worldManager;
     private IslandManager islandManager;
     private ProfileManager profileManager;
     private BoardAdapter boardAdapter;
+    private final NamespacedKey schematicKey = new NamespacedKey(this, "schematicKey");
 
     public static zSkyBlock getInstance() {
         return instance;
@@ -57,6 +63,7 @@ public final class zSkyBlock extends JavaPlugin {
         this.worldManager.create();
         
         this.islandManager = new IslandManager();
+        this.islandManager.calculateX();
         this.profileManager = new ProfileManager();
 
         this.initializeCommands();
@@ -85,20 +92,27 @@ public final class zSkyBlock extends JavaPlugin {
                 new YamlConfiguration(), "scoreboard.yml");
         this.language = new Config(this, new File(getDataFolder(), "language.yml"),
                 new YamlConfiguration(), "language.yml");
+        this.data = new Config(this, new File(getDataFolder(), "data.yml"),
+                new YamlConfiguration(), "data.yml");
 
         this.configuration.create();
         this.scoreboard.create();
         this.language.create();
+        this.data.create();
     }
 
     private void initializeListeners(PluginManager pluginManager){
         List.of(
-                new SkyBlockListener()
+                new SkyBlockListener(),
+                new IslandListener(),
+                new ProfileListener()
         ).forEach(listener -> pluginManager.registerEvents(listener, this));
     }
 
     private void initializeCommands(){
         CommandManager islandCommandManager = new CommandManager(this.getCommand("island"));
+
+        islandCommandManager.addSubCommand(new IslandCreateCommand());
 
         islandCommandManager.registerCommands();
     }
@@ -141,5 +155,11 @@ public final class zSkyBlock extends JavaPlugin {
 
     public YamlConfiguration getConfiguration() {
         return this.configuration.getConfiguration();
+    }
+
+    public YamlConfiguration getData(){ return this.data.getConfiguration(); }
+
+    public NamespacedKey getSchematicKey() {
+        return schematicKey;
     }
 }

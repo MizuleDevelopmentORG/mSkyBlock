@@ -10,6 +10,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.persistence.PersistentDataType;
 
 import java.util.ArrayList;
 import java.util.Objects;
@@ -37,17 +38,30 @@ public class IslandCreateCommand extends Command {
             for (final String schematic : Objects.requireNonNull(zSkyBlock.getInstance().getConfiguration().getConfigurationSection("islands.schematics")).getKeys(false)) {
                 ItemStack itemStack = new ItemStack(Material.valueOf(zSkyBlock.getInstance().getConfiguration().getString("islands.schematics." + schematic + ".item")));
                 ItemMeta meta = itemStack.getItemMeta();
+                meta.getPersistentDataContainer().set(zSkyBlock.getInstance().getSchematicKey(), PersistentDataType.STRING,
+                        Objects.requireNonNull(zSkyBlock.getInstance().getConfiguration().getString("islands.schematics." + schematic + ".schematic-file")));
                 meta.displayName(zSkyBlock.getInstance().getColor().parse(zSkyBlock.getInstance().getConfiguration().getString("islands.schematics." + schematic + ".name")));
                 ArrayList<Component> components = new ArrayList<>();
                 for (final String lore : zSkyBlock.getInstance().getConfiguration().getStringList("islands.schematics." + schematic + ".lore")) {
                     components.add(zSkyBlock.getInstance().getColor().parse(lore));
                 }
                 meta.lore(components);
+                itemStack.setItemMeta(meta);
 
                 inventory.setItem(zSkyBlock.getInstance().getConfiguration().getInt("islands.schematics." + schematic + ".slot"), itemStack);
             }
 
+            if (zSkyBlock.getInstance().getConfiguration().getBoolean("islands.inventory.overlay")) {
+                for (int i = 0; i < inventory.getSize(); i++) {
+                    if (inventory.getItem(i) == null) {
+                        inventory.setItem(i, new ItemStack(Material.valueOf(zSkyBlock.getInstance().getConfiguration().getString("islands.inventory.overlay-item"))));
+                    }
+                }
+            }
+
             player.openInventory(inventory);
+        } else {
+            // create
         }
     }
 
