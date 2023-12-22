@@ -3,6 +3,7 @@ package com.mizuledevelopment.zskyblock.database.impl;
 import com.mizuledevelopment.zskyblock.database.Storage;
 import com.mizuledevelopment.zskyblock.island.Island;
 import com.mizuledevelopment.zskyblock.profile.Profile;
+import com.mizuledevelopment.zskyblock.utils.world.location.LocationSerializer;
 import com.mizuledevelopment.zskyblock.utils.wrapper.impl.IslandWrapper;
 import com.mizuledevelopment.zskyblock.utils.wrapper.impl.ProfileWrapper;
 import com.mizuledevelopment.zskyblock.zSkyBlock;
@@ -97,7 +98,35 @@ public class MySQL extends Storage {
 
     @Override
     public void save() {
+        zSkyBlock.getInstance().getIslandManager().getIslands().forEach(island -> {
+            try {
+                PreparedStatement statement = getConnection().prepareStatement("UPDATE islands SET leader = ?, loc1 = ?, loc2 = ?, size = ?, points = ? WHERE name = ?");
+                statement.setString(1, island.leader().toString());
+                statement.setString(2, LocationSerializer.serialize(island.cuboid().getLocation1(), zSkyBlock.getInstance().getWorldManager().getWorld()));
+                statement.setString(3, LocationSerializer.serialize(island.cuboid().getLocation2(), zSkyBlock.getInstance().getWorldManager().getWorld()));
+                statement.setInt(4, island.size());
+                statement.setInt(5, island.points());
+                statement.setString(6, island.name());
+                statement.executeUpdate();
+                statement.close();
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
+        });
 
+        zSkyBlock.getInstance().getProfileManager().getProfiles().forEach((uuid, profile) -> {
+
+            try {
+                PreparedStatement statement = getConnection().prepareStatement("UPDATE profiles SET island = ?, reclaimed = ? WHERE player = ?");
+                statement.setString(1, profile.islandName());
+                statement.setString(2, String.valueOf(profile.reclaimed()));
+                statement.setString(3, profile.uuid().toString());
+                statement.executeUpdate();
+                statement.close();
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
+        });
     }
 
     @Override
@@ -109,12 +138,18 @@ public class MySQL extends Storage {
             if (resultSet.next()) {
                 Bukkit.getConsoleSender().sendMessage("BOOL " + resultSet.getString("reclaimed"));
                 zSkyBlock.getInstance().getProfileManager().getProfiles()
-                        .add(new ProfileWrapper(resultSet.getString("player"),
+                        .put(uuid, new ProfileWrapper(resultSet.getString("player"),
                                 resultSet.getString("island"),
                                 false).wrap());
             } else {
+                PreparedStatement preparedStatement = getConnection().prepareStatement("INSERT INTO profiles(player, island, reclaimed) VALUES (?,?,?)");
+                preparedStatement.setString(1, uuid.toString());
+                preparedStatement.setString(2, null);
+                preparedStatement.setString(3, "false");
+                preparedStatement.executeUpdate();
+                preparedStatement.close();
                 zSkyBlock.getInstance().getProfileManager().getProfiles()
-                        .add(new Profile(uuid, null, false));
+                        .put(uuid, new Profile(uuid, null, false));
             }
         } catch (SQLException e) {
             throw new RuntimeException(e);

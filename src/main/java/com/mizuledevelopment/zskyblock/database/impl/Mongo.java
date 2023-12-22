@@ -68,9 +68,9 @@ public class Mongo extends Storage {
                     new DocumentWrapper(island).wrap(WrapperType.ISLAND), new UpdateOptions().upsert(true));
         });
 
-        zSkyBlock.getInstance().getProfileManager().getProfiles().forEach(profile -> {
-            profiles.replaceOne(Filters.eq("player", profile.uuid().toString())
-                    , new DocumentWrapper(profile).wrap(WrapperType.PROFILE), new UpdateOptions().upsert(true));
+        zSkyBlock.getInstance().getProfileManager().getProfiles().forEach((uuid, profile) -> {
+            profiles.replaceOne(Filters.eq("player", uuid.toString()),
+                    new DocumentWrapper(profile).wrap(WrapperType.PROFILE), new UpdateOptions().upsert(true));
         });
     }
 
@@ -79,10 +79,10 @@ public class Mongo extends Storage {
         Document document = profiles.find(Filters.eq("uuid", uuid.toString())).first();
         if (document == null) {
             zSkyBlock.getInstance().getProfileManager().getProfiles()
-                    .add(new Profile(uuid, null, false));
+                    .put(uuid, new Profile(uuid, null, false));
         } else {
             zSkyBlock.getInstance().getProfileManager().getProfiles()
-                    .add(new ProfileWrapper(document.getString("player"),
+                    .put(uuid, new ProfileWrapper(document.getString("player"),
                             document.getString("island"),
                             document.getBoolean("reclaimed")).wrap());
         }

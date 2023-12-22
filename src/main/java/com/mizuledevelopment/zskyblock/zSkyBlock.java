@@ -51,8 +51,11 @@ public final class zSkyBlock extends JavaPlugin {
 
         this.initializeConfig();
 
+        this.islandManager = new IslandManager();
+        this.profileManager = new ProfileManager();
+
         this.database = new Database(DatabaseType.valueOf(Objects.requireNonNull(getConfiguration().getString("database")).toUpperCase(Locale.ROOT)));
-        this.database.getStorage().load();
+        //this.database.getStorage().load();
 
         this.boardAdapter = new BoardAdapter();
 
@@ -61,9 +64,6 @@ public final class zSkyBlock extends JavaPlugin {
 
         this.worldManager = new WorldManager();
         this.worldManager.create();
-        
-        this.islandManager = new IslandManager();
-        this.profileManager = new ProfileManager();
 
         this.initializeCommands();
         this.initializeListeners(Bukkit.getPluginManager());
