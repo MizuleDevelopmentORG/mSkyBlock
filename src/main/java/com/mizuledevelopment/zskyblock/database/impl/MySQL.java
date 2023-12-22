@@ -15,25 +15,24 @@ import java.util.List;
 import java.util.UUID;
 
 public class MySQL extends Storage {
-
     private Connection connection;
 
     public Connection getConnection(){
         if (connection != null) return connection;
 
-        String url =
-                "jdbc:mysql://" +
-                zSkyBlock.getInstance().getConfiguration().getString("mysql.host") +
-                ":" + zSkyBlock.getInstance().getConfiguration().getString("mysql.port") + "/"
-                + zSkyBlock.getInstance().getConfiguration().getString("mysql.database");
+        String host = "jdbc:mysql://" + zSkyBlock.getInstance().getConfiguration().getString("mysql.host") + ":"
+                + zSkyBlock.getInstance().getConfiguration().getString("mysql.port")
+                + "/" + zSkyBlock.getInstance().getConfiguration().getString("mysql.database");
         String user = zSkyBlock.getInstance().getConfiguration().getString("mysql.auth.user");
         String pass = zSkyBlock.getInstance().getConfiguration().getString("mysql.auth.password");
 
         try {
-            return this.connection = DriverManager.getConnection(url, user, pass);
+            this.connection = DriverManager.getConnection(host, user, pass);
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
+
+        return this.connection;
     }
 
     @Override
@@ -50,6 +49,15 @@ public class MySQL extends Storage {
 
     @Override
     public void load() {
+
+        try {
+            if (connection.isClosed()) {
+                connection = getConnection();
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+
         String islandQuery = "SELECT * FROM islands ORDER BY name";
         String profileQuery = "SELECT * FROM profiles ORDER BY player";
 
@@ -92,12 +100,20 @@ public class MySQL extends Storage {
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
-
-        zSkyBlock.getInstance().getIslandManager().getIslands().add(wrapper.wrap());
+        if (wrapper.getName() != null) {
+            zSkyBlock.getInstance().getIslandManager().getIslands().add(wrapper.wrap());
+        }
     }
 
     @Override
     public void save() {
+        try {
+            if (connection.isClosed()) {
+                connection = getConnection();
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
         zSkyBlock.getInstance().getIslandManager().getIslands().forEach(island -> {
             try {
                 PreparedStatement statement = getConnection().prepareStatement("UPDATE islands SET leader = ?, loc1 = ?, loc2 = ?, size = ?, points = ? WHERE name = ?");
@@ -131,6 +147,15 @@ public class MySQL extends Storage {
 
     @Override
     public void loadPlayer(UUID uuid) {
+
+        try {
+            if (connection.isClosed()) {
+                connection = getConnection();
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+
         try {
             PreparedStatement statement = getConnection().prepareStatement("SELECT * FROM profiles WHERE player = ?");
             statement.setString(1, uuid.toString());

@@ -63,15 +63,11 @@ public class Mongo extends Storage {
 
     @Override
     public void save() {
-        zSkyBlock.getInstance().getIslandManager().getIslands().forEach(island -> {
-            islands.replaceOne(Filters.eq("name", island.name()),
-                    new DocumentWrapper(island).wrap(WrapperType.ISLAND), new UpdateOptions().upsert(true));
-        });
+        zSkyBlock.getInstance().getIslandManager().getIslands().forEach(island -> islands.replaceOne(Filters.eq("name", island.name()),
+                new DocumentWrapper(island).wrap(WrapperType.ISLAND), new UpdateOptions().upsert(true)));
 
-        zSkyBlock.getInstance().getProfileManager().getProfiles().forEach((uuid, profile) -> {
-            profiles.replaceOne(Filters.eq("player", uuid.toString()),
-                    new DocumentWrapper(profile).wrap(WrapperType.PROFILE), new UpdateOptions().upsert(true));
-        });
+        zSkyBlock.getInstance().getProfileManager().getProfiles().forEach((uuid, profile) -> profiles.replaceOne(Filters.eq("player", uuid.toString()),
+                new DocumentWrapper(profile).wrap(WrapperType.PROFILE), new UpdateOptions().upsert(true)));
     }
 
     @Override
