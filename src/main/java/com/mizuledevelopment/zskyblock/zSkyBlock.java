@@ -63,7 +63,6 @@ public final class zSkyBlock extends JavaPlugin {
         this.worldManager.create();
         
         this.islandManager = new IslandManager();
-        this.islandManager.calculateX();
         this.profileManager = new ProfileManager();
 
         this.initializeCommands();

@@ -11,7 +11,7 @@ import java.util.Set;
 public class IslandManager {
 
     private final int x;
-    private final Set<Island> islands = new HashSet<>();
+    private final HashSet<Island> islands = new HashSet<>();
 
     public IslandManager(){
         this.x = zSkyBlock.getInstance().getData().getInt("x");
@@ -42,7 +42,7 @@ public class IslandManager {
         return new Location(zSkyBlock.getInstance().getWorldManager().getWorld(), (lastX + (islandRadius + maxIslandSize)), y, z);
     }
 
-    public Set<Island> getIslands() {
+    public HashSet<Island> getIslands() {
         return islands;
     }
 

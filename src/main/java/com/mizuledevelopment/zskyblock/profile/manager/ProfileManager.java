@@ -8,9 +8,9 @@ import java.util.UUID;
 
 public class ProfileManager {
 
-    private final Set<Profile> profiles = new HashSet<>();
+    private final HashSet<Profile> profiles = new HashSet<>();
 
-    public Set<Profile> getProfiles() {
+    public HashSet<Profile> getProfiles() {
         return profiles;
     }
 

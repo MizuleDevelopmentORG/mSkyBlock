@@ -1,6 +1,7 @@
 package com.mizuledevelopment.zskyblock.database.impl;
 
 import com.mizuledevelopment.zskyblock.database.Storage;
+import com.mizuledevelopment.zskyblock.profile.Profile;
 import com.mizuledevelopment.zskyblock.utils.wrapper.WrapperType;
 import com.mizuledevelopment.zskyblock.utils.wrapper.impl.DocumentWrapper;
 import com.mizuledevelopment.zskyblock.utils.wrapper.impl.IslandWrapper;
@@ -16,6 +17,7 @@ import org.bson.codecs.configuration.CodecRegistry;
 import org.bson.codecs.pojo.PojoCodecProvider;
 
 import java.util.Objects;
+import java.util.UUID;
 
 import static org.bson.codecs.configuration.CodecRegistries.fromProviders;
 import static org.bson.codecs.configuration.CodecRegistries.fromRegistries;
@@ -44,7 +46,6 @@ public class Mongo extends Storage {
     @Override
     public void load() {
         FindIterable<Document> islandIterable = islands.find();
-        FindIterable<Document> profileIterable = profiles.find();
 
         try (MongoCursor<Document> cursor = islandIterable.iterator()) {
             while (cursor.hasNext()) {
@@ -56,14 +57,6 @@ public class Mongo extends Storage {
                                 document.getList("cuboid", String.class),
                                 document.getInteger("size"),
                                 document.getInteger("points")).wrap());
-            }
-        }
-
-        try (MongoCursor<Document> cursor = profileIterable.iterator()) {
-            while (cursor.hasNext()) {
-                Document document = cursor.next();
-                zSkyBlock.getInstance().getProfileManager().getProfiles()
-                        .add(new ProfileWrapper(document.getString("player"), document.getString("island"), document.getBoolean("reclaimed")).wrap());
             }
         }
     }
@@ -79,6 +72,20 @@ public class Mongo extends Storage {
             profiles.replaceOne(Filters.eq("player", profile.uuid().toString())
                     , new DocumentWrapper(profile).wrap(WrapperType.PROFILE), new UpdateOptions().upsert(true));
         });
+    }
+
+    @Override
+    public void loadPlayer(UUID uuid) {
+        Document document = profiles.find(Filters.eq("uuid", uuid.toString())).first();
+        if (document == null) {
+            zSkyBlock.getInstance().getProfileManager().getProfiles()
+                    .add(new Profile(uuid, null, false));
+        } else {
+            zSkyBlock.getInstance().getProfileManager().getProfiles()
+                    .add(new ProfileWrapper(document.getString("player"),
+                            document.getString("island"),
+                            document.getBoolean("reclaimed")).wrap());
+        }
     }
 
     public MongoCollection<Document> getIslands() {
