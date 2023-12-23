@@ -1,12 +1,13 @@
 package com.mizuledevelopment.zskyblock.database.impl;
 
 import com.mizuledevelopment.zskyblock.database.Storage;
-import com.mizuledevelopment.zskyblock.island.Island;
 import com.mizuledevelopment.zskyblock.profile.Profile;
 import com.mizuledevelopment.zskyblock.utils.world.location.LocationSerializer;
 import com.mizuledevelopment.zskyblock.utils.wrapper.impl.IslandWrapper;
 import com.mizuledevelopment.zskyblock.utils.wrapper.impl.ProfileWrapper;
 import com.mizuledevelopment.zskyblock.zSkyBlock;
+import com.zaxxer.hikari.HikariConfig;
+import com.zaxxer.hikari.HikariDataSource;
 import org.bukkit.Bukkit;
 
 import java.sql.*;
@@ -15,10 +16,13 @@ import java.util.List;
 import java.util.UUID;
 
 public class MySQL extends Storage {
-    private Connection connection;
 
-    public Connection getConnection(){
-        if (connection != null) return connection;
+    private HikariDataSource hikariDataSource;
+
+    @Override
+    public void init(){
+
+        HikariConfig config = new HikariConfig();
 
         String host = "jdbc:mysql://" + zSkyBlock.getInstance().getConfiguration().getString("mysql.host") + ":"
                 + zSkyBlock.getInstance().getConfiguration().getString("mysql.port")
@@ -26,19 +30,15 @@ public class MySQL extends Storage {
         String user = zSkyBlock.getInstance().getConfiguration().getString("mysql.auth.user");
         String pass = zSkyBlock.getInstance().getConfiguration().getString("mysql.auth.password");
 
-        try {
-            this.connection = DriverManager.getConnection(host, user, pass);
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
+        config.setJdbcUrl(host);
+        config.setUsername(user);
+        config.setPassword(pass);
+        config.setMaximumPoolSize(10);
 
-        return this.connection;
-    }
+        this.hikariDataSource = new HikariDataSource(config);
 
-    @Override
-    public void init(){
         try {
-            Statement statement = getConnection().createStatement();
+            Statement statement = getDataSource().getConnection().createStatement();
             statement.execute("CREATE TABLE IF NOT EXISTS profiles(player varchar(36) primary key, island varchar(36), reclaimed varchar(8))");
             statement.execute("CREATE TABLE IF NOT EXISTS islands(name varchar(36) primary key, leader varchar(36), loc1 varchar(36), loc2 varchar(36), size int, points int)");
             statement.close();
@@ -50,20 +50,12 @@ public class MySQL extends Storage {
     @Override
     public void load() {
 
-        try {
-            if (connection.isClosed()) {
-                connection = getConnection();
-            }
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-
         String islandQuery = "SELECT * FROM islands ORDER BY name";
         String profileQuery = "SELECT * FROM profiles ORDER BY player";
 
         IslandWrapper wrapper = new IslandWrapper(null, null, null, null, 0, 0);
 
-        try (PreparedStatement islandStatement = getConnection().prepareStatement(islandQuery,
+        try (PreparedStatement islandStatement = getDataSource().getConnection().prepareStatement(islandQuery,
                 ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
              ResultSet result = islandStatement.executeQuery()) {
             while (result.next()) {
@@ -81,7 +73,7 @@ public class MySQL extends Storage {
                 wrapper.setPoints(points);
                 wrapper.setMembers(new ArrayList<>());
 
-                try (PreparedStatement profileStatement = getConnection().prepareStatement(profileQuery,
+                try (PreparedStatement profileStatement = getDataSource().getConnection().prepareStatement(profileQuery,
                         ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
                      ResultSet rs = profileStatement.executeQuery();) {
                     while (rs.next()) {
@@ -107,16 +99,9 @@ public class MySQL extends Storage {
 
     @Override
     public void save() {
-        try {
-            if (connection.isClosed()) {
-                connection = getConnection();
-            }
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
         zSkyBlock.getInstance().getIslandManager().getIslands().forEach(island -> {
             try {
-                PreparedStatement statement = getConnection().prepareStatement("UPDATE islands SET leader = ?, loc1 = ?, loc2 = ?, size = ?, points = ? WHERE name = ?");
+                PreparedStatement statement = getDataSource().getConnection().prepareStatement("UPDATE islands SET leader = ?, loc1 = ?, loc2 = ?, size = ?, points = ? WHERE name = ?");
                 statement.setString(1, island.leader().toString());
                 statement.setString(2, LocationSerializer.serialize(island.cuboid().getLocation1(), zSkyBlock.getInstance().getWorldManager().getWorld()));
                 statement.setString(3, LocationSerializer.serialize(island.cuboid().getLocation2(), zSkyBlock.getInstance().getWorldManager().getWorld()));
@@ -133,7 +118,7 @@ public class MySQL extends Storage {
         zSkyBlock.getInstance().getProfileManager().getProfiles().forEach((uuid, profile) -> {
 
             try {
-                PreparedStatement statement = getConnection().prepareStatement("UPDATE profiles SET island = ?, reclaimed = ? WHERE player = ?");
+                PreparedStatement statement = getDataSource().getConnection().prepareStatement("UPDATE profiles SET island = ?, reclaimed = ? WHERE player = ?");
                 statement.setString(1, profile.islandName());
                 statement.setString(2, String.valueOf(profile.reclaimed()));
                 statement.setString(3, profile.uuid().toString());
@@ -149,15 +134,7 @@ public class MySQL extends Storage {
     public void loadPlayer(UUID uuid) {
 
         try {
-            if (connection.isClosed()) {
-                connection = getConnection();
-            }
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-
-        try {
-            PreparedStatement statement = getConnection().prepareStatement("SELECT * FROM profiles WHERE player = ?");
+            PreparedStatement statement = getDataSource().getConnection().prepareStatement("SELECT * FROM profiles WHERE player = ?");
             statement.setString(1, uuid.toString());
             ResultSet resultSet = statement.executeQuery();
             if (resultSet.next()) {
@@ -167,7 +144,7 @@ public class MySQL extends Storage {
                                 resultSet.getString("island"),
                                 false).wrap());
             } else {
-                PreparedStatement preparedStatement = getConnection().prepareStatement("INSERT INTO profiles(player, island, reclaimed) VALUES (?,?,?)");
+                PreparedStatement preparedStatement = getDataSource().getConnection().prepareStatement("INSERT INTO profiles(player, island, reclaimed) VALUES (?,?,?)");
                 preparedStatement.setString(1, uuid.toString());
                 preparedStatement.setString(2, null);
                 preparedStatement.setString(3, "false");
@@ -179,6 +156,10 @@ public class MySQL extends Storage {
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public HikariDataSource getDataSource() {
+        return hikariDataSource;
     }
 
     @Override
